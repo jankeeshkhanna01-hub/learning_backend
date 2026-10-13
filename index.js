@@ -41,5 +41,4 @@ function getHandler(req,res){
 // now we will write the cmd nodemon index.js instead of node index.js  to run the program or server
 // go to package.json and inside the script write "start":"nodemon index.js"  to start the server or program by typing mpn start 
  //  now we can write npm start then it will run the server or program 
- 
 
