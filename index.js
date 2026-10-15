@@ -10,8 +10,8 @@
 //came back
 // syntax to remember
 const express = require('express')
-const fs = require("fs");
 const app = express();
+const fs = require("fs");
 
 const content = fs.readFileSync("./posts.json","utf-8")               // reading data through file 
 const jsonPost = JSON.parse(content)                                      // to wrap in json format always had to write 
@@ -34,7 +34,7 @@ function getHandler(req,res){
     res.status(200).json(jsonPost)                                    // cmd to post the data 
 }
 
-// toh abb code mein chota change bhi karega toh tujhe terminal wapa s kholkr code ko run karna padta h soo we us enodemon for that 
+// toh abb code mein chota change bhi karega toh tujhe terminal wapa s kholkr code ko run karna padta h soo we us nodemon for that 
 // npm install --save-dev nodemon
 // this created a devdependency which have nodemon which means dependency for only this project 
 // now we will write the cmd nodemon index.js instead of node index.js  to run the program or server
@@ -47,9 +47,9 @@ function getHandler(req,res){
 
 //get a post 
 
-app.get("post/:postId",getPoatbyId)
+app.get("post/:postId",getPostbyId)
 
-    function getPoatbyId(req,res){
+    function getPostbyId(req,res){
 try{
 
     const postid =  req.params.postId;                                        // params is impo in here 
@@ -87,6 +87,7 @@ function createPost(req,res){
             postArr.push(req.body)
         
         res.status(201).json({                                                                          //use post man for the post request simply download it and dont sign in enter ur url and go to body and then select raw and then select json then send post and it will show post craeted or any other message u see            message : "post created "
+        message : "post created" 
         })
     }catch(err){
         res.status(500).json({
@@ -105,6 +106,32 @@ function createPost(req,res){
 app.patch("/post",updatePost)
 
 function updatePost(){
+    try {
+        const postid = req.params.postId;        // which post to update
+        const updatedData = req.body;            // new data sent by the client
+        console.log("postID:", postid)
+        const postsArr = jsonPost.post
+
+        for (let i = 0; i < postsArr.length; i++) {
+            if (postsArr[i].id == postid) {
+                // merge the old post with the new data
+                postsArr[i] = { ...postsArr[i], ...updatedData }                                    //2. { ... } (curly braces)
+                                                                                                   //This creates a brand new object. Inside it, you list what should go into that object.
+                return res.status(200).json({
+                    message: "post updated",
+                    post: postsArr[i]
+                })
+            }
+        }
+
+        return res.status(404).json({
+            post: "post not found"
+        })
+    } catch (err) {
+        return res.status(500).json({
+            response: "something went wrong"     // failure is in our code
+        })
+    }
 
 }
 
@@ -113,5 +140,30 @@ function updatePost(){
 app.delete("/post/:postId",deletePost)
 
 function deletePost(){
+     try {
+        const postid = req.params.postId;        // which post to delete
+        console.log("postID:", postid)
+        const postsArr = jsonPost.post
+
+        for (let i = 0; i < postsArr.length; i++) {
+            if (postsArr[i].id == postid) {
+                // remove 1 item at index i
+                const deletedPost = postsArr.splice(i, 1)[0]                            //postsArr.splice(i, 1) removes 1 item starting at index i. It modifies the original array in place and returns a new array containing the removed items. Since we removed only one, we take [0] to get that single post object, so we can send it back in the response.
+
+                return res.status(200).json({
+                    message: "post deleted",
+                    post: deletedPost
+                })
+            }
+        }
+
+        return res.status(404).json({
+            post: "post not found"
+        })
+    } catch (err) {
+        return res.status(500).json({
+            response: "something went wrong"     // failure is in our code
+        })
+    }
 
 }
